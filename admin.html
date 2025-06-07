@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Adminbereich</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
-      background-color: #0f0f0f;
+      background-color: #0d0d0d;
       color: #00fff7;
-      font-family: 'Arial', sans-serif;
+      font-family: Arial, sans-serif;
       padding: 15px;
     }
     h1, h2 {
@@ -18,7 +18,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 30px;
-      background-color: #1e1e1e;
+      background-color: #1a1a1a;
     }
     th, td {
       border: 1px solid #00fff7;
@@ -44,9 +44,6 @@
       text-decoration: none;
     }
     @media (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
       table, th, td {
         font-size: 12px;
       }
@@ -55,18 +52,18 @@
 </head>
 <body>
   <a class="back-btn" href="auswahl.html">⬅️ Zurück zum Hauptmenü</a>
-  <h1>📋 Admin Dashboard</h1>
+  <h1>🔐 Admin Dashboard</h1>
 
-  <h2>📱 Handy-Mietungen</h2>
+  <h2>📱 iPhone-Mietungen</h2>
   <table id="mietungenTable">
     <tr>
       <th>Name</th>
-      <th>Gerät</th>
+      <th>Modell</th>
       <th>Von – Bis</th>
       <th>Zubehör</th>
       <th>Gesamtpreis</th>
       <th>Bezahlt</th>
-      <th>Aktionen</th>
+      <th>Aktion</th>
     </tr>
   </table>
 
@@ -77,60 +74,63 @@
       <th>Produkte</th>
       <th>Gesamtpreis</th>
       <th>Bezahlt</th>
-      <th>Aktionen</th>
+      <th>Aktion</th>
     </tr>
   </table>
 
   <script>
-    // Zugangsschutz
-    const adminCode = prompt("🔐 Admin-Code eingeben:");
-    if (adminCode !== "admin123") {
-      alert("❌ Falscher Code. Zugriff verweigert.");
+    const code = prompt("Admin-Code:");
+    if (code !== "admin123") {
+      alert("Falscher Code!");
       location.href = "login.html";
     }
 
-    // Daten laden
     const mietungen = JSON.parse(localStorage.getItem("mietungen")) || [];
     const brawlstarsKaeufe = JSON.parse(localStorage.getItem("brawlstarsKaeufe")) || [];
 
     const mietungenTable = document.getElementById("mietungenTable");
     const brawlTable = document.getElementById("brawlTable");
 
-    mietungen.forEach((eintrag, index) => {
+    // Mietungen anzeigen
+    mietungen.forEach((m, index) => {
       const row = mietungenTable.insertRow();
       row.innerHTML = `
-        <td>${eintrag.name}</td>
-        <td>${eintrag.geraet}</td>
-        <td>${eintrag.von} – ${eintrag.bis}</td>
-        <td>${eintrag.kabel ? "Ja" : "Nein"}</td>
-        <td>${eintrag.preis.toFixed(2)} €</td>
-        <td><input type="checkbox" ${eintrag.bezahlt ? "checked" : ""} onchange="toggleBezahlt('mietungen', ${index}, this.checked)"></td>
-        <td><button onclick="deleteEntry('mietungen', ${index})">Löschen</button></td>
+        <td>${m.name}</td>
+        <td>${m.modell}</td>
+        <td>${m.von} – ${m.bis}</td>
+        <td>${m.kabel || "–"}</td>
+        <td>${parseFloat(m.preis).toFixed(2)} €</td>
+        <td><input type="checkbox" ${m.bezahlt ? "checked" : ""} onchange="toggleBezahlt('mietungen', ${index}, this.checked)" /></td>
+        <td><button onclick="deleteEntry('mietungen', ${index})">🗑️</button></td>
       `;
     });
 
-    brawlstarsKaeufe.forEach((eintrag, index) => {
+    // Brawl Stars Käufe anzeigen
+    brawlstarsKaeufe.forEach((k, index) => {
       const row = brawlTable.insertRow();
-      const produktText = eintrag.produkte.map(p => `${p.name} ×${p.menge}`).join(", ");
+      const produktText = Object.entries(k.produkte)
+        .map(([key, val]) => `${key} ×${val}`)
+        .join(", ");
+
       row.innerHTML = `
-        <td>${eintrag.name}</td>
+        <td>${k.name}</td>
         <td>${produktText}</td>
-        <td>${eintrag.gesamtpreis.toFixed(2)} €</td>
-        <td><input type="checkbox" ${eintrag.bezahlt ? "checked" : ""} onchange="toggleBezahlt('brawlstarsKaeufe', ${index}, this.checked)"></td>
-        <td><button onclick="deleteEntry('brawlstarsKaeufe', ${index})">Löschen</button></td>
+        <td>${parseFloat(k.gesamtPreis).toFixed(2)} €</td>
+        <td><input type="checkbox" ${k.bezahlt ? "checked" : ""} onchange="toggleBezahlt('brawlstarsKaeufe', ${index}, this.checked)" /></td>
+        <td><button onclick="deleteEntry('brawlstarsKaeufe', ${index})">🗑️</button></td>
       `;
     });
 
-    function toggleBezahlt(storageKey, index, checked) {
-      const daten = JSON.parse(localStorage.getItem(storageKey)) || [];
-      daten[index].bezahlt = checked;
-      localStorage.setItem(storageKey, JSON.stringify(daten));
+    function toggleBezahlt(key, index, status) {
+      const daten = JSON.parse(localStorage.getItem(key)) || [];
+      daten[index].bezahlt = status;
+      localStorage.setItem(key, JSON.stringify(daten));
     }
 
-    function deleteEntry(storageKey, index) {
-      const daten = JSON.parse(localStorage.getItem(storageKey)) || [];
+    function deleteEntry(key, index) {
+      const daten = JSON.parse(localStorage.getItem(key)) || [];
       daten.splice(index, 1);
-      localStorage.setItem(storageKey, JSON.stringify(daten));
+      localStorage.setItem(key, JSON.stringify(daten));
       location.reload();
     }
   </script>
