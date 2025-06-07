@@ -2,155 +2,185 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>iPhone mieten</title>
   <style>
     body {
       background-color: #000;
-      color: #00fff2;
+      color: #00f7ff;
       font-family: Arial, sans-serif;
       padding: 15px;
     }
+
     h1 {
       text-align: center;
-    }
-    .section {
       margin-bottom: 20px;
     }
+
     label {
       display: block;
       margin-top: 10px;
+      font-weight: bold;
     }
-    input, select, button {
+
+    input[type="text"],
+    input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      background-color: #000;
+      border: 2px solid #00f7ff;
+      color: #00f7ff;
+      border-radius: 5px;
+    }
+
+    .checkbox-container {
+      margin-top: 10px;
+    }
+
+    .checkbox-container label {
+      display: flex;
+      align-items: center;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      transform: scale(1.3);
+      margin-right: 10px;
+    }
+
+    button {
       width: 100%;
       padding: 12px;
-      margin-top: 5px;
-      border-radius: 6px;
+      margin-top: 20px;
+      font-size: 16px;
+      background-color: #00f7ff;
       border: none;
-      font-size: 1rem;
-    }
-    input[type="date"] {
-      background: #111;
-      color: #00fff2;
-    }
-    button {
-      background-color: #00fff2;
       color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .info {
-      margin-top: 15px;
+      border-radius: 5px;
       font-weight: bold;
     }
-    .back {
+
+    .price {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+
+    .back-btn {
       margin-top: 30px;
-      text-align: center;
+      background-color: transparent;
+      border: 2px solid #00f7ff;
+      color: #00f7ff;
     }
   </style>
 </head>
 <body>
-  <h1>📱 iPhone mieten</h1>
-  <div class="section">
-    <label>Dein Name:</label>
-    <input type="text" id="name" placeholder="Name eingeben" />
-    
-    <label>iPhone Modell:</label>
-    <select id="modell">
-      <option value="iPhone 12 Pro">iPhone 12 Pro</option>
-      <option value="iPhone 8">iPhone 8</option>
-    </select>
+  <h1>iPhone mieten</h1>
 
-    <label>Zubehör:</label>
-    <select id="kabel">
-      <option value="nein">Kein Kabel</option>
-      <option value="ja">Lightning-Kabel (+0,50 €)</option>
-    </select>
+  <label for="name">Dein Name</label>
+  <input type="text" id="name" placeholder="Max Mustermann" required>
 
-    <label>Startdatum:</label>
-    <input type="date" id="start" />
-
-    <label>Enddatum:</label>
-    <input type="date" id="ende" />
+  <label>Modell</label>
+  <div class="checkbox-container">
+    <label><input type="radio" name="modell" value="iPhone 12 Pro"> iPhone 12 Pro</label>
+    <label><input type="radio" name="modell" value="iPhone 8"> iPhone 8</label>
   </div>
 
-  <div class="info" id="preis">Gesamtpreis: 0 €</div>
-  <button onclick="buchen()">Buchen</button>
+  <label for="von">Startdatum</label>
+  <input type="date" id="von">
 
-  <div class="back">
-    <button onclick="location.href='auswahl.html'">Zurück zum Hauptmenü</button>
-  </div>
+  <label for="bis">Enddatum</label>
+  <input type="date" id="bis">
+
+  <label for="kabel"><input type="checkbox" id="kabel"> Lightning-Kabel (+0,50 €)</label>
+
+  <div class="price" id="preisAnzeige">Gesamtpreis: 0,00 €</div>
+
+  <button onclick="buchen()">Jetzt buchen</button>
+  <button class="back-btn" onclick="window.location.href='auswahl.html'">Zurück zum Hauptmenü</button>
 
   <script>
-    function tageDifferenz(von, bis) {
-      const start = new Date(von);
-      const ende = new Date(bis);
-      const diff = Math.ceil((ende - start) / (1000 * 60 * 60 * 24));
-      return Math.max(diff, 1); // Mindestens 1 Tag
-    }
+    const preise = {
+      "iPhone 12 Pro": { tag: 1, woche: 5, monat: 18 },
+      "iPhone 8": { tag: null, woche: 3, monat: 10 }
+    };
 
-    function berechnePreis() {
-      const modell = document.getElementById("modell").value;
-      const kabel = document.getElementById("kabel").value;
-      const von = document.getElementById("start").value;
-      const bis = document.getElementById("ende").value;
+    const kabelPreis = 0.5;
+    const preisAnzeige = document.getElementById("preisAnzeige");
 
-      if (!von || !bis) return 0;
+    document.querySelectorAll("input, select").forEach(el => {
+      el.addEventListener("change", updatePreis);
+    });
 
-      const tage = tageDifferenz(von, bis);
+    function updatePreis() {
+      const modell = document.querySelector("input[name='modell']:checked")?.value;
+      const von = new Date(document.getElementById("von").value);
+      const bis = new Date(document.getElementById("bis").value);
+      let tage = Math.round((bis - von) / (1000 * 60 * 60 * 24)) + 1;
+      if (!modell || isNaN(tage) || tage <= 0) return preisAnzeige.textContent = "Gesamtpreis: 0,00 €";
+
       let preis = 0;
-
-      if (modell === "iPhone 12 Pro") {
-        if (tage < 7) preis = tage * 1;
-        else if (tage < 30) preis = Math.ceil(tage / 7) * 5;
-        else preis = Math.ceil(tage / 30) * 18;
-      } else if (modell === "iPhone 8") {
-        if (tage < 30) preis = Math.ceil(tage / 7) * 3;
-        else preis = Math.ceil(tage / 30) * 10;
+      if (tage >= 30) {
+        preis = preise[modell].monat;
+      } else if (tage >= 7) {
+        preis = preise[modell].woche;
+      } else {
+        preis = preise[modell].tag ?? 0;
+        preis *= tage;
       }
 
-      if (kabel === "ja") preis += 0.5;
-
-      return preis.toFixed(2);
+      if (document.getElementById("kabel").checked) preis += kabelPreis;
+      preisAnzeige.textContent = `Gesamtpreis: ${preis.toFixed(2)} €`;
     }
 
     function buchen() {
       const name = document.getElementById("name").value.trim();
-      const modell = document.getElementById("modell").value;
-      const kabel = document.getElementById("kabel").value;
-      const von = document.getElementById("start").value;
-      const bis = document.getElementById("ende").value;
-      const preis = berechnePreis();
+      const modell = document.querySelector("input[name='modell']:checked")?.value;
+      const von = document.getElementById("von").value;
+      const bis = document.getElementById("bis").value;
+      const kabel = document.getElementById("kabel").checked ? "Lightning-Kabel" : "Keins";
 
-      if (!name || !von || !bis) {
-        alert("Bitte alle Felder ausfüllen!");
+      if (!name || !modell || !von || !bis) {
+        alert("Bitte alle Felder korrekt ausfüllen.");
         return;
       }
 
-      // Termine blockieren
-      const buchung = {
-        name,
-        modell,
-        kabel: kabel === "ja" ? "Lightning-Kabel" : "Kein Zubehör",
-        von,
-        bis,
-        preis,
-        bezahlt: false
-      };
+      const vonDate = new Date(von);
+      const bisDate = new Date(bis);
 
-      const liste = JSON.parse(localStorage.getItem("mietungen") || "[]");
-      liste.push(buchung);
-      localStorage.setItem("mietungen", JSON.stringify(liste));
+      const tage = Math.round((bisDate - vonDate) / (1000 * 60 * 60 * 24)) + 1;
+      if (tage <= 0) {
+        alert("Enddatum muss nach dem Startdatum liegen.");
+        return;
+      }
+
+      const buchungen = JSON.parse(localStorage.getItem("mietungen") || "[]");
+      const konflikt = buchungen.some(b => b.modell === modell && (
+        (new Date(b.von) <= bisDate && new Date(b.bis) >= vonDate)
+      ));
+      if (konflikt) {
+        alert("Dieser Zeitraum ist für das gewählte Modell bereits gebucht.");
+        return;
+      }
+
+      let preis = 0;
+      if (tage >= 30) {
+        preis = preise[modell].monat;
+      } else if (tage >= 7) {
+        preis = preise[modell].woche;
+      } else {
+        preis = preise[modell].tag ?? 0;
+        preis *= tage;
+      }
+      if (kabel === "Lightning-Kabel") preis += kabelPreis;
+
+      buchungen.push({ name, modell, von, bis, kabel, preis: preis.toFixed(2), bezahlt: false });
+      localStorage.setItem("mietungen", JSON.stringify(buchungen));
 
       alert("Buchung gespeichert!");
       window.location.href = "auswahl.html";
     }
-
-    document.querySelectorAll("input, select").forEach(el => {
-      el.addEventListener("change", () => {
-        document.getElementById("preis").innerText = "Gesamtpreis: " + berechnePreis() + " €";
-      });
-    });
   </script>
 </body>
-</html>>
+</html>
