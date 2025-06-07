@@ -9,7 +9,7 @@
       background-color: #0f0f0f;
       color: #00fff7;
       font-family: 'Arial', sans-serif;
-      padding: 20px;
+      padding: 15px;
     }
     h1, h2 {
       text-align: center;
@@ -43,6 +43,14 @@
       border-radius: 4px;
       text-decoration: none;
     }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      table, th, td {
+        font-size: 12px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -50,11 +58,11 @@
   <h1>📋 Admin Dashboard</h1>
 
   <h2>📱 Handy-Mietungen</h2>
-  <table id="handyTable">
+  <table id="mietungenTable">
     <tr>
       <th>Name</th>
       <th>Gerät</th>
-      <th>Zeitraum</th>
+      <th>Von – Bis</th>
       <th>Zubehör</th>
       <th>Gesamtpreis</th>
       <th>Bezahlt</th>
@@ -66,7 +74,7 @@
   <table id="brawlTable">
     <tr>
       <th>Name</th>
-      <th>Gekauft</th>
+      <th>Produkte</th>
       <th>Gesamtpreis</th>
       <th>Bezahlt</th>
       <th>Aktionen</th>
@@ -74,44 +82,44 @@
   </table>
 
   <script>
-    // Passwortschutz beim Laden
-    const zugang = prompt("🔐 Admin-Code eingeben:");
-    if (zugang !== "admin123") {
-      alert("❌ Falscher Code – Zugriff verweigert.");
-      window.location.href = "login.html";
+    // Zugangsschutz
+    const adminCode = prompt("🔐 Admin-Code eingeben:");
+    if (adminCode !== "admin123") {
+      alert("❌ Falscher Code. Zugriff verweigert.");
+      location.href = "login.html";
     }
 
-    function loadData() {
-      const handyData = JSON.parse(localStorage.getItem("handyBuchungen")) || [];
-      const brawlData = JSON.parse(localStorage.getItem("brawlstarsBuchungen")) || [];
+    // Daten laden
+    const mietungen = JSON.parse(localStorage.getItem("mietungen")) || [];
+    const brawlstarsKaeufe = JSON.parse(localStorage.getItem("brawlstarsKaeufe")) || [];
 
-      const handyTable = document.getElementById("handyTable");
-      const brawlTable = document.getElementById("brawlTable");
+    const mietungenTable = document.getElementById("mietungenTable");
+    const brawlTable = document.getElementById("brawlTable");
 
-      handyData.forEach((entry, index) => {
-        const row = handyTable.insertRow();
-        row.innerHTML = `
-          <td>${entry.name}</td>
-          <td>${entry.geraet}</td>
-          <td>${entry.von} – ${entry.bis}</td>
-          <td>${entry.kabel ? "Ja" : "Nein"}</td>
-          <td>${entry.preis.toFixed(2)} €</td>
-          <td><input type="checkbox" ${entry.bezahlt ? "checked" : ""} onchange="toggleBezahlt('handyBuchungen', ${index}, this.checked)"></td>
-          <td><button onclick="deleteEntry('handyBuchungen', ${index})">Löschen</button></td>
-        `;
-      });
+    mietungen.forEach((eintrag, index) => {
+      const row = mietungenTable.insertRow();
+      row.innerHTML = `
+        <td>${eintrag.name}</td>
+        <td>${eintrag.geraet}</td>
+        <td>${eintrag.von} – ${eintrag.bis}</td>
+        <td>${eintrag.kabel ? "Ja" : "Nein"}</td>
+        <td>${eintrag.preis.toFixed(2)} €</td>
+        <td><input type="checkbox" ${eintrag.bezahlt ? "checked" : ""} onchange="toggleBezahlt('mietungen', ${index}, this.checked)"></td>
+        <td><button onclick="deleteEntry('mietungen', ${index})">Löschen</button></td>
+      `;
+    });
 
-      brawlData.forEach((entry, index) => {
-        const row = brawlTable.insertRow();
-        row.innerHTML = `
-          <td>${entry.name}</td>
-          <td>${entry.produkte.map(p => `${p.name} ×${p.menge}`).join(", ")}</td>
-          <td>${entry.gesamtpreis.toFixed(2)} €</td>
-          <td><input type="checkbox" ${entry.bezahlt ? "checked" : ""} onchange="toggleBezahlt('brawlstarsBuchungen', ${index}, this.checked)"></td>
-          <td><button onclick="deleteEntry('brawlstarsBuchungen', ${index})">Löschen</button></td>
-        `;
-      });
-    }
+    brawlstarsKaeufe.forEach((eintrag, index) => {
+      const row = brawlTable.insertRow();
+      const produktText = eintrag.produkte.map(p => `${p.name} ×${p.menge}`).join(", ");
+      row.innerHTML = `
+        <td>${eintrag.name}</td>
+        <td>${produktText}</td>
+        <td>${eintrag.gesamtpreis.toFixed(2)} €</td>
+        <td><input type="checkbox" ${eintrag.bezahlt ? "checked" : ""} onchange="toggleBezahlt('brawlstarsKaeufe', ${index}, this.checked)"></td>
+        <td><button onclick="deleteEntry('brawlstarsKaeufe', ${index})">Löschen</button></td>
+      `;
+    });
 
     function toggleBezahlt(storageKey, index, checked) {
       const daten = JSON.parse(localStorage.getItem(storageKey)) || [];
@@ -125,8 +133,6 @@
       localStorage.setItem(storageKey, JSON.stringify(daten));
       location.reload();
     }
-
-    loadData();
   </script>
 </body>
 </html>
