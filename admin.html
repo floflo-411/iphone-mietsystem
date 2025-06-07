@@ -1,182 +1,132 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard</title>
+  <meta charset="UTF-8">
+  <title>Adminbereich</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      background-color: black;
-      color: #00ffc3;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 15px;
+      background-color: #0f0f0f;
+      color: #00fff7;
+      font-family: 'Arial', sans-serif;
+      padding: 20px;
     }
-
-    h1 {
+    h1, h2 {
       text-align: center;
-      font-size: 24px;
     }
-
-    .tabelle {
+    table {
       width: 100%;
-      margin: 20px 0;
       border-collapse: collapse;
-      border: 2px solid #00ffc3;
+      margin-bottom: 30px;
+      background-color: #1e1e1e;
     }
-
-    .tabelle th, .tabelle td {
-      border: 1px solid #00ffc3;
+    th, td {
+      border: 1px solid #00fff7;
       padding: 8px;
       text-align: center;
     }
-
-    .tabelle th {
-      background-color: #002b25;
-    }
-
     button {
-      background-color: #00ffc3;
-      color: black;
-      padding: 10px;
+      background-color: #00fff7;
+      color: #000;
       border: none;
-      margin: 10px 5px;
-      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 4px;
       cursor: pointer;
-      border-radius: 6px;
     }
-
-    .zurueck-btn {
-      display: block;
-      margin: 20px auto;
-    }
-
-    @media (max-width: 600px) {
-      body {
-        padding: 8px;
-      }
-
-      .tabelle th, .tabelle td {
-        font-size: 12px;
-        padding: 5px;
-      }
-
-      h1 {
-        font-size: 20px;
-      }
+    .back-btn {
+      margin-bottom: 20px;
+      display: inline-block;
+      background-color: transparent;
+      color: #00fff7;
+      border: 1px solid #00fff7;
+      padding: 6px 12px;
+      border-radius: 4px;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
+  <a class="back-btn" href="auswahl.html">⬅️ Zurück zum Hauptmenü</a>
+  <h1>📋 Admin Dashboard</h1>
 
-<h1>📋 Admin Dashboard</h1>
-
-<table class="tabelle" id="handyTabelle">
-  <thead>
+  <h2>📱 Handy-Mietungen</h2>
+  <table id="handyTable">
     <tr>
       <th>Name</th>
       <th>Gerät</th>
       <th>Zeitraum</th>
       <th>Zubehör</th>
-      <th>Preis</th>
+      <th>Gesamtpreis</th>
       <th>Bezahlt</th>
-      <th>Löschen</th>
+      <th>Aktionen</th>
     </tr>
-  </thead>
-  <tbody id="handyTbody">
-    <tr><td colspan="7">Lade Buchungen...</td></tr>
-  </tbody>
-</table>
+  </table>
 
-<table class="tabelle" id="brawlTabelle">
-  <thead>
+  <h2>💎 Brawl Stars Käufe</h2>
+  <table id="brawlTable">
     <tr>
       <th>Name</th>
-      <th>Produkte</th>
-      <th>Preis</th>
+      <th>Gekauft</th>
+      <th>Gesamtpreis</th>
       <th>Bezahlt</th>
-      <th>Löschen</th>
+      <th>Aktionen</th>
     </tr>
-  </thead>
-  <tbody id="brawlTbody">
-    <tr><td colspan="5">Lade Käufe...</td></tr>
-  </tbody>
-</table>
+  </table>
 
-<button class="zurueck-btn" onclick="window.location.href='auswahl.html'">Zurück zum Hauptmenü</button>
-
-<script>
-  const pw = prompt("Admin-Passwort eingeben:");
-  if (pw !== "adminflo") {
-    alert("Falsches Passwort!");
-    window.location.href = "login.html";
-  }
-
-  function ladeBuchungen() {
-    const daten = JSON.parse(localStorage.getItem("handyBuchungen")) || [];
-    const tbody = document.getElementById("handyTbody");
-    tbody.innerHTML = "";
-
-    if (daten.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='7'>Keine Buchungen vorhanden</td></tr>";
-      return;
+  <script>
+    // Passwortschutz beim Laden
+    const zugang = prompt("🔐 Admin-Code eingeben:");
+    if (zugang !== "admin123") {
+      alert("❌ Falscher Code – Zugriff verweigert.");
+      window.location.href = "login.html";
     }
 
-    daten.forEach((b, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${b.name}</td>
-        <td>${b.geraet}</td>
-        <td>${b.start} bis ${b.ende}</td>
-        <td>${b.kabel ? "Ja" : "Nein"}</td>
-        <td>${b.preis} €</td>
-        <td><input type="checkbox" ${b.bezahlt ? "checked" : ""} onchange="toggleBezahlt('handyBuchungen', ${i}, this.checked)"></td>
-        <td><button onclick="loeschen('handyBuchungen', ${i})">❌</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+    function loadData() {
+      const handyData = JSON.parse(localStorage.getItem("handyBuchungen")) || [];
+      const brawlData = JSON.parse(localStorage.getItem("brawlstarsBuchungen")) || [];
 
-  function ladeBrawlKaeufe() {
-    const daten = JSON.parse(localStorage.getItem("brawlKaeufe")) || [];
-    const tbody = document.getElementById("brawlTbody");
-    tbody.innerHTML = "";
+      const handyTable = document.getElementById("handyTable");
+      const brawlTable = document.getElementById("brawlTable");
 
-    if (daten.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='5'>Keine Käufe vorhanden</td></tr>";
-      return;
+      handyData.forEach((entry, index) => {
+        const row = handyTable.insertRow();
+        row.innerHTML = `
+          <td>${entry.name}</td>
+          <td>${entry.geraet}</td>
+          <td>${entry.von} – ${entry.bis}</td>
+          <td>${entry.kabel ? "Ja" : "Nein"}</td>
+          <td>${entry.preis.toFixed(2)} €</td>
+          <td><input type="checkbox" ${entry.bezahlt ? "checked" : ""} onchange="toggleBezahlt('handyBuchungen', ${index}, this.checked)"></td>
+          <td><button onclick="deleteEntry('handyBuchungen', ${index})">Löschen</button></td>
+        `;
+      });
+
+      brawlData.forEach((entry, index) => {
+        const row = brawlTable.insertRow();
+        row.innerHTML = `
+          <td>${entry.name}</td>
+          <td>${entry.produkte.map(p => `${p.name} ×${p.menge}`).join(", ")}</td>
+          <td>${entry.gesamtpreis.toFixed(2)} €</td>
+          <td><input type="checkbox" ${entry.bezahlt ? "checked" : ""} onchange="toggleBezahlt('brawlstarsBuchungen', ${index}, this.checked)"></td>
+          <td><button onclick="deleteEntry('brawlstarsBuchungen', ${index})">Löschen</button></td>
+        `;
+      });
     }
 
-    daten.forEach((b, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${b.name}</td>
-        <td>${b.produkte.join(", ")}</td>
-        <td>${b.preis} €</td>
-        <td><input type="checkbox" ${b.bezahlt ? "checked" : ""} onchange="toggleBezahlt('brawlKaeufe', ${i}, this.checked)"></td>
-        <td><button onclick="loeschen('brawlKaeufe', ${i})">❌</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+    function toggleBezahlt(storageKey, index, checked) {
+      const daten = JSON.parse(localStorage.getItem(storageKey)) || [];
+      daten[index].bezahlt = checked;
+      localStorage.setItem(storageKey, JSON.stringify(daten));
+    }
 
-  function loeschen(key, index) {
-    const daten = JSON.parse(localStorage.getItem(key)) || [];
-    daten.splice(index, 1);
-    localStorage.setItem(key, JSON.stringify(daten));
-    ladeBuchungen();
-    ladeBrawlKaeufe();
-  }
+    function deleteEntry(storageKey, index) {
+      const daten = JSON.parse(localStorage.getItem(storageKey)) || [];
+      daten.splice(index, 1);
+      localStorage.setItem(storageKey, JSON.stringify(daten));
+      location.reload();
+    }
 
-  function toggleBezahlt(key, index, status) {
-    const daten = JSON.parse(localStorage.getItem(key)) || [];
-    daten[index].bezahlt = status;
-    localStorage.setItem(key, JSON.stringify(daten));
-  }
-
-  // Initiales Laden
-  ladeBuchungen();
-  ladeBrawlKaeufe();
-</script>
-
+    loadData();
+  </script>
 </body>
 </html>
