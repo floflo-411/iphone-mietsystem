@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brawl Stars Shop</title>
+<style>
+  body {
+    background-color: #010f10;
+    color: #40e0d0; /* Türkis */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 600;
+  }
+  input[type="text"] {
+    padding: 8px;
+    font-size: 16px;
+    width: 100%;
+    max-width: 350px;
+    margin-top: 5px;
+    border: 2px solid #40e0d0;
+    border-radius: 5px;
+    background-color: #003232;
+    color: #40e0d0;
+  }
+  .product-row {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 350px;
+  }
+  .product-name {
+    flex: 1;
+  }
+  .quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  button {
+    background-color: #005a5a;
+    border: 2px solid #40e0d0;
+    color: #40e0d0;
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #40e0d0;
+    color: #003232;
+  }
+  #preisAnzeige {
+    margin-top: 30px;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+  }
+  #buchenBtn {
+    margin-top: 30px;
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #40e0d0;
+    color: #003232;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+  }
+  #buchenBtn:hover {
+    background-color: #30cfcf;
+  }
+  #zurueckBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: transparent;
+    border: 2px solid #40e0d0;
+    color: #40e0d0;
+    border-radius: 6px;
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #zurueckBtn:hover {
+    background-color: #40e0d0;
+    color: #003232;
+  }
+</style>
+</head>
+<body>
+  <h1>Brawl Stars Shop</h1>
+
+  <label for="nameInput">Dein Name</label>
+  <input type="text" id="nameInput" placeholder="Name eingeben" />
+
+  <div class="product-row">
+    <div class="product-name">Brawlpässe (13 €)</div>
+    <div class="quantity-control">
+      <button id="bpMinus">−</button>
+      <span id="bpCount">0</span>
+      <button id="bpPlus">+</button>
+    </div>
+  </div>
+
+  <div class="product-row">
+    <div class="product-name">Gems 30 (3 €)</div>
+    <div class="quantity-control">
+      <button id="g30Minus">−</button>
+      <span id="g30Count">0</span>
+      <button id="g30Plus">+</button>
+    </div>
+  </div>
+
+  <div class="product-row">
+    <div class="product-name">Gems 80 (6,50 €)</div>
+    <div class="quantity-control">
+      <button id="g80Minus">−</button>
+      <span id="g80Count">0</span>
+      <button id="g80Plus">+</button>
+    </div>
+  </div>
+
+  <div class="product-row">
+    <div class="product-name">Gems 170 (13 €)</div>
+    <div class="quantity-control">
+      <button id="g170Minus">−</button>
+      <span id="g170Count">0</span>
+      <button id="g170Plus">+</button>
+    </div>
+  </div>
+
+  <div class="product-row">
+    <div class="product-name">Gems 360 (25 €)</div>
+    <div class="quantity-control">
+      <button id="g360Minus">−</button>
+      <span id="g360Count">0</span>
+      <button id="g360Plus">+</button>
+    </div>
+  </div>
+
+  <div class="product-row">
+    <div class="product-name">Gems 950 (63 €)</div>
+    <div class="quantity-control">
+      <button id="g950Minus">−</button>
+      <span id="g950Count">0</span>
+      <button id="g950Plus">+</button>
+    </div>
+  </div>
+
+  <div class="product-row">
+    <div class="product-name">Gems 2000 (125 €)</div>
+    <div class="quantity-control">
+      <button id="g2000Minus">−</button>
+      <span id="g2000Count">0</span>
+      <button id="g2000Plus">+</button>
+    </div>
+  </div>
+
+  <div id="preisAnzeige">Gesamtpreis: 0 €</div>
+
+  <button id="buchenBtn">Buchen</button>
+  <button id="zurueckBtn">Zurück zum Hauptmenü</button>
+
+<script>
+  // Preise (können auch aus localStorage geladen werden, hier hardcoded als Beispiel)
+  const preise = {
+    brawlpässe: 13,
+    gems30: 3,
+    gems80: 6.5,
+    gems170: 13,
+    gems360: 25,
+    gems950: 63,
+    gems2000: 125
+  };
+
+  // Counts
+  let counts = {
+    brawlpässe: 0,
+    gems30: 0,
+    gems80: 0,
+    gems170: 0,
+    gems360: 0,
+    gems950: 0,
+    gems2000: 0
+  };
+
+  // Elements mapping
+  const mapping = [
+    ['bpMinus', 'bpPlus', 'bpCount', 'brawlpässe'],
+    ['g30Minus', 'g30Plus', 'g30Count', 'gems30'],
+    ['g80Minus', 'g80Plus', 'g80Count', 'gems80'],
+    ['g170Minus', 'g170Plus', 'g170Count', 'gems170'],
+    ['g360Minus', 'g360Plus', 'g360Count', 'gems360'],
+    ['g950Minus', 'g950Plus', 'g950Count', 'gems950'],
+    ['g2000Minus', 'g2000Plus', 'g2000Count', 'gems2000'],
+  ];
+
+  // Update Preis Anzeige
+  function updatePreis() {
+    let summe = 0;
+    for (const key in counts) {
+      summe += counts[key] * preise[key];
+    }
+    document.getElementById('preisAnzeige').textContent = `Gesamtpreis: ${summe.toFixed(2)} €`;
+    return summe;
+  }
+
+  // Buttons Event Handler registrieren
+  mapping.forEach(([minusId, plusId, countId, key]) => {
+    const minusBtn = document.getElementById(minusId);
+    const plusBtn = document.getElementById(plusId);
+    const countSpan = document.getElementById(countId);
+
+    minusBtn.addEventListener('click', () => {
+      if (counts[key] > 0) {
+        counts[key]--;
+        countSpan.textContent = counts[key];
+        updatePreis();
+      }
+    });
+    plusBtn.addEventListener('click', () => {
+      counts[key]++;
+      countSpan.textContent = counts[key];
+      updatePreis();
+    });
+  });
+
+  // Buchen Button
+  document.getElementById('buchenBtn').addEventListener('click', () => {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) {
+      alert('Bitte gib deinen Namen ein.');
+      return;
+    }
+    // Prüfen, ob mindestens ein Produkt ausgewählt ist
+    const totalCount = Object.values(counts).reduce((a,b) => a+b, 0);
+    if (totalCount === 0) {
+      alert('Bitte wähle mindestens ein Produkt aus.');
+      return;
+    }
+
+    const gesamtPreis = updatePreis();
+
+    // Neue Bestellung Objekt bauen
+    const neueBestellung = {
+      name: name,
+      produkte: {},
+      gesamtPreis: gesamtPreis,
+      bezahlt: false
+    };
+    // Füge alle Produkte mit >0 hinzu
+    for (const key in counts) {
+      if (counts[key] > 0) {
+        neueBestellung.produkte[key] = counts[key];
+      }
+    }
+
+    // Bestellungen aus Storage holen oder leeren Array
+    let brawlKaeufe = JSON.parse(localStorage.getItem('brawlstarsKaeufe')) || [];
+
+    // Neue Bestellung speichern
+    brawlKaeufe.push(neueBestellung);
+    localStorage.setItem('brawlstarsKaeufe', JSON.stringify(brawlKaeufe));
+
+    alert('Deine Bestellung wurde gespeichert!');
+
+    // Formular zurücksetzen
+    document.getElementById('nameInput').value = '';
+    for (const key in counts) {
+      counts[key] = 0;
+    }
+    mapping.forEach(([,, countId]) => {
+      document.getElementById(countId).textContent = '0';
+    });
+    updatePreis();
+  });
+
+  // Zurück Button
+  document.getElementById('zurueckBtn').addEventListener('click', () => {
+    window.location.href = 'auswahl.html'; // Zurück zum Hauptmenü
+  });
+
+  // Initial Preis Anzeige aktualisieren
+  updatePreis();
+</script>
+</body>
+</html>

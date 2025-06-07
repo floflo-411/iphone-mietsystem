@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      background-color: black;
+      color: #00ffc3;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 15px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 24px;
+    }
+
+    .tabelle {
+      width: 100%;
+      margin: 20px 0;
+      border-collapse: collapse;
+      border: 2px solid #00ffc3;
+    }
+
+    .tabelle th, .tabelle td {
+      border: 1px solid #00ffc3;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .tabelle th {
+      background-color: #002b25;
+    }
+
+    button {
+      background-color: #00ffc3;
+      color: black;
+      padding: 10px;
+      border: none;
+      margin: 10px 5px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .zurueck-btn {
+      display: block;
+      margin: 20px auto;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 8px;
+      }
+
+      .tabelle th, .tabelle td {
+        font-size: 12px;
+        padding: 5px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>📋 Admin Dashboard</h1>
+
+<table class="tabelle" id="handyTabelle">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Gerät</th>
+      <th>Zeitraum</th>
+      <th>Zubehör</th>
+      <th>Preis</th>
+      <th>Bezahlt</th>
+      <th>Löschen</th>
+    </tr>
+  </thead>
+  <tbody id="handyTbody">
+    <tr><td colspan="7">Lade Buchungen...</td></tr>
+  </tbody>
+</table>
+
+<table class="tabelle" id="brawlTabelle">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Produkte</th>
+      <th>Preis</th>
+      <th>Bezahlt</th>
+      <th>Löschen</th>
+    </tr>
+  </thead>
+  <tbody id="brawlTbody">
+    <tr><td colspan="5">Lade Käufe...</td></tr>
+  </tbody>
+</table>
+
+<button class="zurueck-btn" onclick="window.location.href='auswahl.html'">Zurück zum Hauptmenü</button>
+
+<script>
+  const pw = prompt("Admin-Passwort eingeben:");
+  if (pw !== "adminflo") {
+    alert("Falsches Passwort!");
+    window.location.href = "login.html";
+  }
+
+  function ladeBuchungen() {
+    const daten = JSON.parse(localStorage.getItem("handyBuchungen")) || [];
+    const tbody = document.getElementById("handyTbody");
+    tbody.innerHTML = "";
+
+    if (daten.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='7'>Keine Buchungen vorhanden</td></tr>";
+      return;
+    }
+
+    daten.forEach((b, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${b.name}</td>
+        <td>${b.geraet}</td>
+        <td>${b.start} bis ${b.ende}</td>
+        <td>${b.kabel ? "Ja" : "Nein"}</td>
+        <td>${b.preis} €</td>
+        <td><input type="checkbox" ${b.bezahlt ? "checked" : ""} onchange="toggleBezahlt('handyBuchungen', ${i}, this.checked)"></td>
+        <td><button onclick="loeschen('handyBuchungen', ${i})">❌</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function ladeBrawlKaeufe() {
+    const daten = JSON.parse(localStorage.getItem("brawlKaeufe")) || [];
+    const tbody = document.getElementById("brawlTbody");
+    tbody.innerHTML = "";
+
+    if (daten.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='5'>Keine Käufe vorhanden</td></tr>";
+      return;
+    }
+
+    daten.forEach((b, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${b.name}</td>
+        <td>${b.produkte.join(", ")}</td>
+        <td>${b.preis} €</td>
+        <td><input type="checkbox" ${b.bezahlt ? "checked" : ""} onchange="toggleBezahlt('brawlKaeufe', ${i}, this.checked)"></td>
+        <td><button onclick="loeschen('brawlKaeufe', ${i})">❌</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function loeschen(key, index) {
+    const daten = JSON.parse(localStorage.getItem(key)) || [];
+    daten.splice(index, 1);
+    localStorage.setItem(key, JSON.stringify(daten));
+    ladeBuchungen();
+    ladeBrawlKaeufe();
+  }
+
+  function toggleBezahlt(key, index, status) {
+    const daten = JSON.parse(localStorage.getItem(key)) || [];
+    daten[index].bezahlt = status;
+    localStorage.setItem(key, JSON.stringify(daten));
+  }
+
+  // Initiales Laden
+  ladeBuchungen();
+  ladeBrawlKaeufe();
+</script>
+
+</body>
+</html>

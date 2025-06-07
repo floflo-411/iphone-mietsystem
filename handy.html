@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>iPhone mieten</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00fff2;
+      font-family: Arial, sans-serif;
+      padding: 15px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: none;
+      font-size: 1rem;
+    }
+    input[type="date"] {
+      background: #111;
+      color: #00fff2;
+    }
+    button {
+      background-color: #00fff2;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .info {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    .back {
+      margin-top: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>📱 iPhone mieten</h1>
+  <div class="section">
+    <label>Dein Name:</label>
+    <input type="text" id="name" placeholder="Name eingeben" />
+    
+    <label>iPhone Modell:</label>
+    <select id="modell">
+      <option value="iPhone 12 Pro">iPhone 12 Pro</option>
+      <option value="iPhone 8">iPhone 8</option>
+    </select>
+
+    <label>Zubehör:</label>
+    <select id="kabel">
+      <option value="nein">Kein Kabel</option>
+      <option value="ja">Lightning-Kabel (+0,50 €)</option>
+    </select>
+
+    <label>Startdatum:</label>
+    <input type="date" id="start" />
+
+    <label>Enddatum:</label>
+    <input type="date" id="ende" />
+  </div>
+
+  <div class="info" id="preis">Gesamtpreis: 0 €</div>
+  <button onclick="buchen()">Buchen</button>
+
+  <div class="back">
+    <button onclick="location.href='auswahl.html'">Zurück zum Hauptmenü</button>
+  </div>
+
+  <script>
+    function tageDifferenz(von, bis) {
+      const start = new Date(von);
+      const ende = new Date(bis);
+      const diff = Math.ceil((ende - start) / (1000 * 60 * 60 * 24));
+      return Math.max(diff, 1); // Mindestens 1 Tag
+    }
+
+    function berechnePreis() {
+      const modell = document.getElementById("modell").value;
+      const kabel = document.getElementById("kabel").value;
+      const von = document.getElementById("start").value;
+      const bis = document.getElementById("ende").value;
+
+      if (!von || !bis) return 0;
+
+      const tage = tageDifferenz(von, bis);
+      let preis = 0;
+
+      if (modell === "iPhone 12 Pro") {
+        if (tage < 7) preis = tage * 1;
+        else if (tage < 30) preis = Math.ceil(tage / 7) * 5;
+        else preis = Math.ceil(tage / 30) * 18;
+      } else if (modell === "iPhone 8") {
+        if (tage < 30) preis = Math.ceil(tage / 7) * 3;
+        else preis = Math.ceil(tage / 30) * 10;
+      }
+
+      if (kabel === "ja") preis += 0.5;
+
+      return preis.toFixed(2);
+    }
+
+    function buchen() {
+      const name = document.getElementById("name").value.trim();
+      const modell = document.getElementById("modell").value;
+      const kabel = document.getElementById("kabel").value;
+      const von = document.getElementById("start").value;
+      const bis = document.getElementById("ende").value;
+      const preis = berechnePreis();
+
+      if (!name || !von || !bis) {
+        alert("Bitte alle Felder ausfüllen!");
+        return;
+      }
+
+      // Termine blockieren
+      const buchung = {
+        name,
+        modell,
+        kabel: kabel === "ja" ? "Lightning-Kabel" : "Kein Zubehör",
+        von,
+        bis,
+        preis,
+        bezahlt: false
+      };
+
+      const liste = JSON.parse(localStorage.getItem("mietungen") || "[]");
+      liste.push(buchung);
+      localStorage.setItem("mietungen", JSON.stringify(liste));
+
+      alert("Buchung gespeichert!");
+      window.location.href = "auswahl.html";
+    }
+
+    document.querySelectorAll("input, select").forEach(el => {
+      el.addEventListener("change", () => {
+        document.getElementById("preis").innerText = "Gesamtpreis: " + berechnePreis() + " €";
+      });
+    });
+  </script>
+</body>
+</html>>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registrieren</title>
+  <style>
+    body {
+      background-color: #000;
+      font-family: Arial, sans-serif;
+      color: #00fff2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background-color: #111;
+      padding: 25px;
+      border: 2px solid #00fff2;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 20px #00fff2;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      background-color: #222;
+      color: #00fff2;
+    }
+    button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      background-color: #00fff2;
+      color: #000;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #00d1c7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📝 Registrieren</h1>
+    <label for="username">Benutzername</label>
+    <input type="text" id="username" placeholder="z. B. Max123" />
+
+    <label for="password">Passwort</label>
+    <input type="password" id="password" placeholder="Passwort" />
+
+    <button onclick="register()">Registrieren</button>
+  </div>
+
+  <script>
+    function register() {
+      const user = document.getElementById("username").value.trim();
+      const pw = document.getElementById("password").value.trim();
+
+      if (!user || !pw) {
+        alert("Bitte alle Felder ausfüllen!");
+        return;
+      }
+
+      const nutzer = JSON.parse(localStorage.getItem("nutzer") || "[]");
+
+      const exists = nutzer.find(n => n.username === user);
+      if (exists) {
+        alert("Benutzername ist bereits vergeben.");
+        return;
+      }
+
+      nutzer.push({ username: user, passwort: pw });
+      localStorage.setItem("nutzer", JSON.stringify(nutzer));
+
+      alert("Registrierung erfolgreich!");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

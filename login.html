@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00f7ff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      background-color: #111;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px #00f7ff;
+      max-width: 400px;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #00f7ff;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      background: #00f7ff;
+      border: none;
+      border-radius: 6px;
+      color: #000;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #00d0e0;
+    }
+    .switch {
+      margin-top: 15px;
+      text-align: center;
+    }
+    .switch a {
+      color: #00f7ff;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔐 Login</h1>
+    <label for="username">Benutzername</label>
+    <input type="text" id="username" placeholder="z. B. Max123" />
+
+    <label for="password">Passwort</label>
+    <input type="password" id="password" placeholder="Passwort" />
+
+    <button onclick="login()">Einloggen</button>
+
+    <div class="switch">
+      Noch kein Account? <a href="register.html">Registrieren</a>
+    </div>
+  </div>
+
+  <script>
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      // Admin-Zugang
+      if (username === "admin" && password === "adminflo") {
+        localStorage.setItem("eingeloggt", "admin");
+        window.location.href = "admin.html";
+        return;
+      }
+
+      const gespeicherteNutzer = JSON.parse(localStorage.getItem("nutzer") || "[]");
+      const nutzer = gespeicherteNutzer.find(n => n.username === username && n.passwort === password);
+
+      if (nutzer) {
+        localStorage.setItem("eingeloggt", username);
+        window.location.href = "auswahl.html";
+      } else {
+        alert("❌ Falscher Benutzername oder Passwort");
+      }
+    }
+  </script>
+</body>
+</html>
